@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Daftar Karyawan')}"></head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Daftar Karyawan</h1>
+                <a class="btn btn-primary" th:href="@{/employees/new}">
+                    <i class="bi bi-plus-lg me-1"></i> Tambah Karyawan
+                </a>
+            </div>
+
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>ID Karyawan</th>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>Departemen</th>
+                                <th>Jabatan</th>
+                                <th>Sisa Cuti</th>
+                                <th>Aksi</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="employee : ${employees}">
+                                <td th:text="${employee.employeeId}">EMP001</td>
+                                <td th:text="${employee.name}">John Doe</td>
+                                <td th:text="${employee.email}">john@example.com</td>
+                                <td th:text="${employee.department}">IT</td>
+                                <td th:text="${employee.position}">Developer</td>
+                                <td>
+                                    <span class="badge bg-primary" th:text="${employee.annualLeaveBalance} + ' hari'">12 hari</span>
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       th:href="@{/employees/{id}(id=${employee.id})}" title="Lihat">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-warning"
+                                       th:href="@{/employees/{id}/edit(id=${employee.id})}" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a class="btn btn-sm btn-outline-success"
+                                       th:href="@{/leave-requests/new(employeeId=${employee.id})}" title="Ajukan Cuti">
+                                        <i class="bi bi-calendar-plus"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(employees)}">
+                                <td class="text-center text-muted py-4" colspan="7">
+                                    <i class="bi bi-people fs-1 d-block mb-2"></i>
+                                    Belum ada data karyawan
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: scripts}"></footer>
+</body>
+</html>
