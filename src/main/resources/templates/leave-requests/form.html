@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ajukan Cuti Baru')}"></head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Ajukan Cuti Baru</h1>
+                <a class="btn btn-outline-secondary" th:href="@{/leave-requests}">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                </a>
+            </div>
+
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="post" th:action="@{/leave-requests}" th:object="${leaveRequest}">
+                                <div class="mb-3">
+                                    <label class="form-label" for="employeeId">Karyawan <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="employeeId" name="employeeId" required>
+                                        <option value="">-- Pilih Karyawan --</option>
+                                        <option th:each="employee : ${employees}"
+                                                th:selected="${selectedEmployeeId != null && employee.id == selectedEmployeeId}"
+                                                th:text="${employee.name + ' (' + employee.employeeId + ') - Sisa cuti: ' + employee.annualLeaveBalance + ' hari'}"
+                                                th:value="${employee.id}">
+                                            John Doe (EMP001)
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="leaveType">Jenis Cuti <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="leaveType" required th:field="*{leaveType}">
+                                        <option value="">-- Pilih Jenis Cuti --</option>
+                                        <option th:each="type : ${leaveTypes}"
+                                                th:text="${type.displayName}"
+                                                th:value="${type.name()}">
+                                            Cuti Tahunan
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="startDate">Tanggal Mulai <span
+                                                class="text-danger">*</span></label>
+                                        <input class="form-control" id="startDate" required th:field="*{startDate}"
+                                               type="date">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="endDate">Tanggal Selesai <span
+                                                class="text-danger">*</span></label>
+                                        <input class="form-control" id="endDate" required th:field="*{endDate}"
+                                               type="date">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="reason">Alasan</label>
+                                    <textarea class="form-control" id="reason" placeholder="Tuliskan alasan pengajuan cuti..." rows="4"
+                                              th:field="*{reason}"></textarea>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="bi bi-send me-1"></i> Ajukan Cuti
+                                    </button>
+                                    <a class="btn btn-outline-secondary" th:href="@{/leave-requests}">Batal</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informasi Jenis Cuti</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <strong>Cuti Tahunan:</strong> Akan mengurangi saldo cuti tahunan
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Cuti Sakit:</strong> Tidak mengurangi saldo cuti
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Cuti Melahirkan:</strong> Sesuai ketentuan UU
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Cuti Menikah:</strong> Maksimal 3 hari
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Cuti Duka:</strong> Maksimal 3 hari
+                                </li>
+                                <li>
+                                    <strong>Cuti Tanpa Gaji:</strong> Tidak mengurangi saldo cuti
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0"><i class="bi bi-calendar3 me-2"></i>Kalkulator Hari</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-2">Total hari cuti:</p>
+                            <h3 class="text-primary" id="totalDays">0 hari</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: scripts}"></footer>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        const totalDays = document.getElementById('totalDays');
+
+        function calculateDays() {
+            if (startDate.value && endDate.value) {
+                const start = new Date(startDate.value);
+                const end = new Date(endDate.value);
+                const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                totalDays.textContent = diff > 0 ? diff + ' hari' : '0 hari';
+            }
+        }
+
+        startDate.addEventListener('change', calculateDays);
+        endDate.addEventListener('change', calculateDays);
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        startDate.setAttribute('min', today);
+        endDate.setAttribute('min', today);
+
+        startDate.addEventListener('change', function () {
+            endDate.setAttribute('min', this.value);
+        });
+    });
+</script>
+</body>
+</html>
