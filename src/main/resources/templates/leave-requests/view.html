@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detail Pengajuan Cuti')}"></head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Detail Pengajuan Cuti</h1>
+                <a class="btn btn-outline-secondary" th:href="@{/leave-requests}">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                </a>
+            </div>
+
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="bi bi-file-text me-2"></i>Informasi Pengajuan</h6>
+                            <span class="badge fs-6"
+                                  th:classappend="${leaveRequest.status.name() == 'PENDING'} ? 'badge-pending' :
+                                                  (${leaveRequest.status.name() == 'APPROVED'} ? 'badge-approved' :
+                                                  (${leaveRequest.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-cancelled'))"
+                                  th:text="${leaveRequest.status.displayName}">Pending</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Karyawan</label>
+                                    <p class="mb-0">
+                                        <a th:href="@{/employees/{id}(id=${leaveRequest.employee.id})}"
+                                           th:text="${leaveRequest.employee.name}">John Doe</a>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">ID Karyawan</label>
+                                    <p class="mb-0" th:text="${leaveRequest.employee.employeeId}">EMP001</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Jenis Cuti</label>
+                                    <p class="mb-0" th:text="${leaveRequest.leaveType.displayName}">Cuti Tahunan</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Jumlah Hari</label>
+                                    <p class="mb-0"><span class="badge bg-primary"
+                                                          th:text="${leaveRequest.totalDays} + ' hari'">5 hari</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Tanggal Mulai</label>
+                                    <p class="mb-0"
+                                       th:text="${#temporals.format(leaveRequest.startDate, 'dd MMMM yyyy')}">01 Januari
+                                        2024</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Tanggal Selesai</label>
+                                    <p class="mb-0"
+                                       th:text="${#temporals.format(leaveRequest.endDate, 'dd MMMM yyyy')}">05 Januari
+                                        2024</p>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label class="text-muted small">Alasan</label>
+                                    <p class="mb-0"
+                                       th:text="${leaveRequest.reason ?: 'Tidak ada alasan yang diberikan'}">Keperluan
+                                        pribadi</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Tanggal Pengajuan</label>
+                                    <p class="mb-0"
+                                       th:text="${#temporals.format(leaveRequest.createdAt, 'dd MMMM yyyy HH:mm')}">01
+                                        Januari 2024 10:00</p>
+                                </div>
+                                <div class="col-md-6 mb-3" th:if="${leaveRequest.updatedAt != null}">
+                                    <label class="text-muted small">Terakhir Diperbarui</label>
+                                    <p class="mb-0"
+                                       th:text="${#temporals.format(leaveRequest.updatedAt, 'dd MMMM yyyy HH:mm')}">01
+                                        Januari 2024 12:00</p>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-3" th:if="${leaveRequest.approverNotes != null}">
+                                <strong>Catatan Persetujuan:</strong>
+                                <p class="mb-0" th:text="${leaveRequest.approverNotes}">Catatan dari approver</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="card" th:if="${leaveRequest.status.name() == 'PENDING'}">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0"><i class="bi bi-check2-square me-2"></i>Tindakan</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form method="post"
+                                          th:action="@{/leave-requests/{id}/approve(id=${leaveRequest.id})}">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="approveNotes">Catatan Persetujuan
+                                                (opsional)</label>
+                                            <textarea class="form-control" id="approveNotes" name="approverNotes"
+                                                      rows="2"></textarea>
+                                        </div>
+                                        <button class="btn btn-success w-100" type="submit">
+                                            <i class="bi bi-check-lg me-1"></i> Setujui Pengajuan
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <form method="post"
+                                          th:action="@{/leave-requests/{id}/reject(id=${leaveRequest.id})}">
+                                        <div class="mb-3">
+                                            <label class="form-label" for="rejectNotes">Alasan Penolakan
+                                                (opsional)</label>
+                                            <textarea class="form-control" id="rejectNotes" name="approverNotes"
+                                                      rows="2"></textarea>
+                                        </div>
+                                        <button class="btn btn-danger w-100" type="submit">
+                                            <i class="bi bi-x-lg me-1"></i> Tolak Pengajuan
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cancel Button for Pending/Approved -->
+                    <div class="card mt-4 border-warning"
+                         th:if="${leaveRequest.status.name() == 'PENDING' || leaveRequest.status.name() == 'APPROVED'}">
+                        <div class="card-header bg-warning">
+                            <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Batalkan Pengajuan</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-3">Batalkan pengajuan cuti ini. Jika sudah disetujui, saldo cuti
+                                akan dikembalikan.</p>
+                            <form method="post" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan ini?');"
+                                  th:action="@{/leave-requests/{id}/cancel(id=${leaveRequest.id})}">
+                                <button class="btn btn-warning" type="submit">
+                                    <i class="bi bi-x-circle me-1"></i> Batalkan Pengajuan
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="bi bi-person me-2"></i>Info Karyawan</h6>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 60px; height: 60px;">
+                                <i class="bi bi-person fs-3 text-primary"></i>
+                            </div>
+                            <h6 th:text="${leaveRequest.employee.name}">John Doe</h6>
+                            <p class="text-muted small mb-1" th:text="${leaveRequest.employee.position}">Developer</p>
+                            <p class="text-muted small" th:text="${leaveRequest.employee.department}">IT Department</p>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Sisa Cuti Tahunan:</span>
+                                <strong th:text="${leaveRequest.employee.annualLeaveBalance} + ' hari'">12 hari</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Timeline</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex mb-3">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                                         style="width: 32px; height: 32px; min-width: 32px;">
+                                        <i class="bi bi-send text-white small"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Pengajuan Dibuat</strong>
+                                        <p class="text-muted small mb-0"
+                                           th:text="${#temporals.format(leaveRequest.createdAt, 'dd MMM yyyy HH:mm')}">
+                                            01 Jan 2024 10:00</p>
+                                    </div>
+                                </li>
+                                <li class="d-flex" th:if="${leaveRequest.status.name() != 'PENDING'}">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                                         style="width: 32px; height: 32px; min-width: 32px;"
+                                         th:classappend="${leaveRequest.status.name() == 'APPROVED'} ? 'bg-success' :
+                                                         (${leaveRequest.status.name() == 'REJECTED'} ? 'bg-danger' : 'bg-secondary')">
+                                        <i class="bi text-white small"
+                                           th:classappend="${leaveRequest.status.name() == 'APPROVED'} ? 'bi-check-lg' :
+                                                           (${leaveRequest.status.name() == 'REJECTED'} ? 'bi-x-lg' : 'bi-x-circle')"></i>
+                                    </div>
+                                    <div>
+                                        <strong th:text="${leaveRequest.status.displayName}">Disetujui</strong>
+                                        <p class="text-muted small mb-0"
+                                           th:if="${leaveRequest.updatedAt != null}"
+                                           th:text="${#temporals.format(leaveRequest.updatedAt, 'dd MMM yyyy HH:mm')}">
+                                            01 Jan 2024 12:00</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: scripts}"></footer>
+</body>
+</html>
