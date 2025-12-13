@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Dashboard</h1>
+                <a class="btn btn-primary" th:href="@{/leave-requests/new}">
+                    <i class="bi bi-plus-lg me-1"></i> Ajukan Cuti Baru
+                </a>
+            </div>
+
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle mb-2 opacity-75">Total Karyawan</h6>
+                                    <h2 class="card-title mb-0" th:text="${totalEmployees}">0</h2>
+                                </div>
+                                <i class="bi bi-people fs-1 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle mb-2 opacity-75">Total Pengajuan</h6>
+                                    <h2 class="card-title mb-0" th:text="${totalRequests}">0</h2>
+                                </div>
+                                <i class="bi bi-file-text fs-1 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle mb-2 opacity-75">Menunggu</h6>
+                                    <h2 class="card-title mb-0" th:text="${pendingRequests}">0</h2>
+                                </div>
+                                <i class="bi bi-hourglass-split fs-1 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle mb-2 opacity-75">Disetujui</h6>
+                                    <h2 class="card-title mb-0" th:text="${approvedRequests}">0</h2>
+                                </div>
+                                <i class="bi bi-check-circle fs-1 opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Leave Requests -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Pengajuan Terbaru</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Karyawan</th>
+                                <th>Jenis Cuti</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="request : ${recentRequests}">
+                                <td th:text="${request.employee.name}">John Doe</td>
+                                <td th:text="${request.leaveType.displayName}">Cuti Tahunan</td>
+                                <td>
+                                    <span th:text="${#temporals.format(request.startDate, 'dd MMM yyyy')}">01 Jan 2024</span>
+                                    -
+                                    <span th:text="${#temporals.format(request.endDate, 'dd MMM yyyy')}">05 Jan 2024</span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${request.status.name() == 'PENDING'} ? 'badge-pending' :
+                                                          (${request.status.name() == 'APPROVED'} ? 'badge-approved' :
+                                                          (${request.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-cancelled'))"
+                                          th:text="${request.status.displayName}">Pending</span>
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       th:href="@{/leave-requests/{id}(id=${request.id})}">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(recentRequests)}">
+                                <td class="text-center text-muted py-4" colspan="5">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    Belum ada pengajuan cuti
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: scripts}"></footer>
+</body>
+</html>
