@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detail Karyawan')}"></head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Detail Karyawan</h1>
+                <div class="btn-group">
+                    <a class="btn btn-outline-secondary" th:href="@{/employees}">
+                        <i class="bi bi-arrow-left me-1"></i> Kembali
+                    </a>
+                    <a class="btn btn-warning" th:href="@{/employees/{id}/edit(id=${employee.id})}">
+                        <i class="bi bi-pencil me-1"></i> Edit
+                    </a>
+                    <a class="btn btn-primary" th:href="@{/leave-requests/new(employeeId=${employee.id})}">
+                        <i class="bi bi-calendar-plus me-1"></i> Ajukan Cuti
+                    </a>
+                </div>
+            </div>
+
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 80px; height: 80px;">
+                                <i class="bi bi-person fs-1"></i>
+                            </div>
+                            <h4 th:text="${employee.name}">John Doe</h4>
+                            <p class="text-muted mb-1" th:text="${employee.position}">Developer</p>
+                            <p class="text-muted" th:text="${employee.department}">IT Department</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0">Sisa Cuti Tahunan</h6>
+                        </div>
+                        <div class="card-body text-center">
+                            <h1 class="text-primary" th:text="${remainingLeave}">12</h1>
+                            <p class="text-muted">hari tersisa</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informasi Karyawan</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">ID Karyawan</label>
+                                    <p class="mb-0" th:text="${employee.employeeId}">EMP001</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Email</label>
+                                    <p class="mb-0" th:text="${employee.email}">john@example.com</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Departemen</label>
+                                    <p class="mb-0" th:text="${employee.department ?: '-'}">IT</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Jabatan</label>
+                                    <p class="mb-0" th:text="${employee.position ?: '-'}">Developer</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="text-muted small">Tanggal Bergabung</label>
+                                    <p class="mb-0"
+                                       th:text="${employee.joinDate != null} ? ${#temporals.format(employee.joinDate, 'dd MMMM yyyy')} : '-'">
+                                        01 Januari 2020</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Riwayat Pengajuan Cuti</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Jenis Cuti</th>
+                                        <th>Tanggal</th>
+                                        <th>Jumlah Hari</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="request : ${leaveRequests}">
+                                        <td th:text="${request.leaveType.displayName}">Cuti Tahunan</td>
+                                        <td>
+                                            <span th:text="${#temporals.format(request.startDate, 'dd MMM')}">01 Jan</span>
+                                            -
+                                            <span th:text="${#temporals.format(request.endDate, 'dd MMM yyyy')}">05 Jan 2024</span>
+                                        </td>
+                                        <td th:text="${request.totalDays} + ' hari'">5 hari</td>
+                                        <td>
+                                            <span class="badge"
+                                                  th:classappend="${request.status.name() == 'PENDING'} ? 'badge-pending' :
+                                                                  (${request.status.name() == 'APPROVED'} ? 'badge-approved' :
+                                                                  (${request.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-cancelled'))"
+                                                  th:text="${request.status.displayName}">Pending</span>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-outline-primary"
+                                               th:href="@{/leave-requests/{id}(id=${request.id})}">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(leaveRequests)}">
+                                        <td class="text-center text-muted py-4" colspan="5">
+                                            Belum ada riwayat pengajuan cuti
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4 border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Zona Berbahaya</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Hapus karyawan ini beserta semua data pengajuan cuti terkait. Tindakan
+                        ini tidak dapat dibatalkan.</p>
+                    <form method="post" onsubmit="return confirm('Apakah Anda yakin ingin menghapus karyawan ini?');"
+                          th:action="@{/employees/{id}/delete(id=${employee.id})}">
+                        <button class="btn btn-danger" type="submit">
+                            <i class="bi bi-trash me-1"></i> Hapus Karyawan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: scripts}"></footer>
+</body>
+</html>
