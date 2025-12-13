@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Daftar Pengajuan Cuti')}"></head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2" th:text="${pageTitle ?: 'Daftar Pengajuan Cuti'}">Daftar Pengajuan Cuti</h1>
+                <a class="btn btn-primary" th:href="@{/leave-requests/new}">
+                    <i class="bi bi-plus-lg me-1"></i> Ajukan Cuti Baru
+                </a>
+            </div>
+
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Karyawan</th>
+                                <th>Jenis Cuti</th>
+                                <th>Tanggal Mulai</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Jumlah Hari</th>
+                                <th>Status</th>
+                                <th>Diajukan</th>
+                                <th>Aksi</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="request : ${leaveRequests}">
+                                <td>
+                                    <a th:href="@{/employees/{id}(id=${request.employee.id})}"
+                                       th:text="${request.employee.name}">John Doe</a>
+                                </td>
+                                <td th:text="${request.leaveType.displayName}">Cuti Tahunan</td>
+                                <td th:text="${#temporals.format(request.startDate, 'dd MMM yyyy')}">01 Jan 2024</td>
+                                <td th:text="${#temporals.format(request.endDate, 'dd MMM yyyy')}">05 Jan 2024</td>
+                                <td th:text="${request.totalDays} + ' hari'">5 hari</td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${request.status.name() == 'PENDING'} ? 'badge-pending' :
+                                                          (${request.status.name() == 'APPROVED'} ? 'badge-approved' :
+                                                          (${request.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-cancelled'))"
+                                          th:text="${request.status.displayName}">Pending</span>
+                                </td>
+                                <td th:text="${#temporals.format(request.createdAt, 'dd MMM yyyy HH:mm')}">01 Jan 2024
+                                    10:00
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       th:href="@{/leave-requests/{id}(id=${request.id})}" title="Lihat Detail">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <th:block th:if="${request.status.name() == 'PENDING'}">
+                                        <form class="d-inline"
+                                              method="post" th:action="@{/leave-requests/{id}/approve(id=${request.id})}">
+                                            <button class="btn btn-sm btn-outline-success" title="Setujui"
+                                                    type="submit">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+                                        <form class="d-inline" method="post"
+                                              th:action="@{/leave-requests/{id}/reject(id=${request.id})}">
+                                            <button class="btn btn-sm btn-outline-danger" title="Tolak" type="submit">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
+                                    </th:block>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(leaveRequests)}">
+                                <td class="text-center text-muted py-4" colspan="8">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    Belum ada pengajuan cuti
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: scripts}"></footer>
+</body>
+</html>
