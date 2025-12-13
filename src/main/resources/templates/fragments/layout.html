@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${title} + ' - Sistem Pengajuan Cuti'">Sistem Pengajuan Cuti</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 4px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card {
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .badge-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .badge-approved {
+            background-color: #28a745;
+        }
+
+        .badge-rejected {
+            background-color: #dc3545;
+        }
+
+        .badge-cancelled {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+<nav class="sidebar col-md-3 col-lg-2 d-md-block collapse" th:fragment="navbar">
+    <div class="position-sticky pt-3">
+        <div class="text-center text-white mb-4 py-3">
+            <i class="bi bi-calendar-check fs-1"></i>
+            <h5 class="mt-2">Sistem Cuti</h5>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${currentPage == 'home'} ? 'active'" th:href="@{/}">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${currentPage == 'employees'} ? 'active'" th:href="@{/employees}">
+                    <i class="bi bi-people"></i> Karyawan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${currentPage == 'leave-requests'} ? 'active'"
+                   th:href="@{/leave-requests}">
+                    <i class="bi bi-file-text"></i> Pengajuan Cuti
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:classappend="${currentPage == 'pending'} ? 'active'"
+                   th:href="@{/leave-requests/pending}">
+                    <i class="bi bi-hourglass-split"></i> Menunggu Persetujuan
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div th:fragment="alerts">
+    <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${success}">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button class="btn-close" data-bs-dismiss="alert" type="button"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${error}">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <span th:text="${error}"></span>
+        <button class="btn-close" data-bs-dismiss="alert" type="button"></button>
+    </div>
+</div>
+
+<footer th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</footer>
+</body>
+</html>
