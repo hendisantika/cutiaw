@@ -20,6 +20,29 @@ Aplikasi web untuk manajemen pengajuan cuti karyawan menggunakan Spring Boot 4, 
 - **Jenis Cuti**: Cuti Tahunan, Sakit, Melahirkan, Paternitas, Menikah, Duka, Tanpa Gaji
 - **Validasi**: Pengecekan saldo cuti, overlap tanggal, dll
 
+## Screenshots
+
+### Dashboard
+![Dashboard](img/dashboard.png)
+
+### Daftar Karyawan
+![Daftar Karyawan](img/daftar_karyawan.png)
+
+### Tambah Karyawan
+![Tambah Karyawan](img/tambah_karyawan.png)
+
+### Daftar Pengajuan Cuti
+![Daftar Pengajuan Cuti](img/daftar_ajuan_cuti.png)
+
+### Form Pengajuan Cuti
+![Form Pengajuan Cuti](img/ajukan.png)
+
+### Detail Pengajuan Cuti
+![Detail Pengajuan Cuti](img/detail_pengajuan_cuti.png)
+
+### Menunggu Persetujuan
+![Menunggu Persetujuan](img/menunggu_persetujuan.png)
+
 ## Prasyarat
 
 - JDK 25
