@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${employee.id != null} ? 'Edit Karyawan' : 'Tambah Karyawan')}"></head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2" th:text="${employee.id != null} ? 'Edit Karyawan' : 'Tambah Karyawan Baru'">Tambah
+                    Karyawan</h1>
+                <a class="btn btn-outline-secondary" th:href="@{/employees}">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                </a>
+            </div>
+
+            <div th:replace="~{fragments/layout :: alerts}"></div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form method="post"
+                          th:action="${employee.id != null} ? @{/employees/{id}(id=${employee.id})} : @{/employees}" th:object="${employee}">
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="employeeId">ID Karyawan <span
+                                        class="text-danger">*</span></label>
+                                <input class="form-control" id="employeeId" required th:field="*{employeeId}"
+                                       th:readonly="${employee.id != null}" type="text">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="name">Nama Lengkap <span
+                                        class="text-danger">*</span></label>
+                                <input class="form-control" id="name" required th:field="*{name}" type="text">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="email">Email <span class="text-danger">*</span></label>
+                                <input class="form-control" id="email" required th:field="*{email}" type="email">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="department">Departemen</label>
+                                <input class="form-control" id="department" th:field="*{department}" type="text">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="position">Jabatan</label>
+                                <input class="form-control" id="position" th:field="*{position}" type="text">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="joinDate">Tanggal Bergabung</label>
+                                <input class="form-control" id="joinDate" th:field="*{joinDate}" type="date">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="annualLeaveBalance">Sisa Cuti Tahunan</label>
+                                <input class="form-control" id="annualLeaveBalance" max="30"
+                                       min="0" th:field="*{annualLeaveBalance}" type="number">
+                                <small class="text-muted">Default: 12 hari per tahun</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-save me-1"></i>
+                                <span th:text="${employee.id != null} ? 'Simpan Perubahan' : 'Tambah Karyawan'">Simpan</span>
+                            </button>
+                            <a class="btn btn-outline-secondary" th:href="@{/employees}">Batal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: scripts}"></footer>
+</body>
+</html>
